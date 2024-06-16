@@ -400,7 +400,7 @@ MiscSection:toggle({name = "Fullbright",def = FullbrightEnabled,callback = funct
     FullbrightEnabled = Value
 end})
 
-local InfStaminaObjects = {}
+local InfStaminaObject
 
 MiscSection:toggle({name = "Infinite stamina",def = InfiniteStaminaEnabled,callback = function(Value)
     InfiniteStaminaEnabled = Value
@@ -414,14 +414,13 @@ MiscSection:toggle({name = "Infinite stamina",def = InfiniteStaminaEnabled,callb
                 if Currents then
                     local BV1 = Instance.new("BoolValue", Currents)
                     BV1.Name = string.reverse("81493.2")
-                    table.insert(InfStaminaObjects, BV1)
+                    InfStaminaObject = BV1
                 end
             end
         end
     else
-        for _,InfStaminaObject in pairs(InfStaminaObjects) do
-            InfStaminaObject:Destroy()
-        end
+        InfStaminaObject:Destroy()
+        InfStaminaObject = nil
     end
 end})
 
