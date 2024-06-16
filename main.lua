@@ -272,6 +272,7 @@ local MiscSection = MiscTab:section({name = "Misc",side = "left",size = 300})
 
 local LockpickHBEEnabled = false
 local FullbrightEnabled = false
+local InfiniteStaminaEnabled = false
 
 PlayerSection:toggle({name = "Enabled",def = ESPSettings.Enabled,callback = function(Value)
     ESPSettings.Enabled = Value
@@ -399,6 +400,51 @@ MiscSection:toggle({name = "Fullbright",def = FullbrightEnabled,callback = funct
     FullbrightEnabled = Value
 end})
 
+local InfStaminaObjects = {}
+
+MiscSection:toggle({name = "Infinite stamina",def = InfiniteStaminaEnabled,callback = function(Value)
+    InfiniteStaminaEnabled = Value
+    if InfiniteStaminaEnabled == true then
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local CharStats = ReplicatedStorage.CharStats
+        if CharStats then
+            local PlayerCharStats = CharStats:FindFirstChild(LocalPlayer.Name)
+            if PlayerCharStats then
+                local Currents = PlayerCharStats:FindFirstChild("Currents")
+                if Currents then
+                    local BV1 = Instance.new("BoolValue", Currents)
+                    BV1.Name = string.reverse("81493.2")
+                    local BV2 = Instance.new("BoolValue", Currents)
+                    BV2.Name = "AntiBleed"
+                    table.insert(InfStaminaObjects, BV1)
+                    table.insert(InfStaminaObjects, BV2)
+                end
+            end
+        end
+    else
+        for _,InfStaminaObject in pairs(InfStaminaObjects) do
+            InfStaminaObject:Destroy()
+        end
+    end
+end})
+
+local OldFOVIdk = workspace.CurrentCamera.FieldOfView
+MiscSection:slider({name = "FOV",def = workspace.CurrentCamera.FieldOfView, max = 360,min = 1,rounding = true,ticking = true,measuring = "",callback = function(Value)
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local CharStats = ReplicatedStorage.CharStats
+    if CharStats then
+        local PlayerCharStats = CharStats:FindFirstChild(LocalPlayer.Name)
+        if PlayerCharStats then
+            local FOVsFolder = PlayerCharStats:FindFirstChild("FOVs")
+            if FOVsFolder then
+                for _,FovValue in pairs(FOVsFolder:GetChildren()) do
+                    FovValue.Value = math.max(Value - OldFOVIdk, 0)
+                end
+            end
+        end
+    end
+end})
+
 PlayerGui.ChildAdded:Connect(function(Child)
     if Child.Name ~= "LockpickGUI" then
         return
@@ -421,4 +467,5 @@ RunService.RenderStepped:Connect(function()
         Lighting.GlobalShadows = false
         Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
     end
+
 end)
