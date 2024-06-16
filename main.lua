@@ -400,28 +400,10 @@ MiscSection:toggle({name = "Fullbright",def = FullbrightEnabled,callback = funct
     FullbrightEnabled = Value
 end})
 
-local InfStaminaObject
+local InfStaminaObject = nil
 
 MiscSection:toggle({name = "Infinite stamina",def = InfiniteStaminaEnabled,callback = function(Value)
     InfiniteStaminaEnabled = Value
-    if InfiniteStaminaEnabled == true then
-        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-        local CharStats = ReplicatedStorage.CharStats
-        if CharStats then
-            local PlayerCharStats = CharStats:FindFirstChild(LocalPlayer.Name)
-            if PlayerCharStats then
-                local Currents = PlayerCharStats:FindFirstChild("Currents")
-                if Currents then
-                    local BV1 = Instance.new("BoolValue", Currents)
-                    BV1.Name = string.reverse("81493.2")
-                    InfStaminaObject = BV1
-                end
-            end
-        end
-    else
-        InfStaminaObject:Destroy()
-        InfStaminaObject = nil
-    end
 end})
 
 local OldFOVIdk = workspace.CurrentCamera.FieldOfView
@@ -462,6 +444,26 @@ RunService.RenderStepped:Connect(function()
         Lighting.FogEnd = 100000
         Lighting.GlobalShadows = false
         Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+    end
+    if InfiniteStaminaEnabled == true then
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local CharStats = ReplicatedStorage.CharStats
+        if CharStats then
+            local PlayerCharStats = CharStats:FindFirstChild(LocalPlayer.Name)
+            if PlayerCharStats then
+                local Currents = PlayerCharStats:FindFirstChild("Currents")
+                if Currents and not Currents:FindFirstChild(string.reverse("81493.2")) then
+                    local BV1 = Instance.new("BoolValue", Currents)
+                    BV1.Name = string.reverse("81493.2")
+                    InfStaminaObject = BV1
+                end
+            end
+        end
+    else
+        if InfStaminaObject ~= nil then
+            InfStaminaObject:Destroy()
+            InfStaminaObject = nil
+        end
     end
 
 end)
