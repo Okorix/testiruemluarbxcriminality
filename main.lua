@@ -26,6 +26,7 @@ local Players = game:GetService("Players")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer.PlayerGui
+local Lighting = game.Lighting
 
 --// Variables
 
@@ -270,6 +271,7 @@ local FOVSection = AimbotTab:section({name = "FOV",side = "right",size = 300})
 local MiscSection = MiscTab:section({name = "Misc",side = "left",size = 300})
 
 local LockpickHBEEnabled = false
+local FullbrightEnabled = false
 
 PlayerSection:toggle({name = "Enabled",def = ESPSettings.Enabled,callback = function(Value)
     ESPSettings.Enabled = Value
@@ -393,6 +395,10 @@ MiscSection:toggle({name = "Lockpick HBE",def = LockpickHBEEnabled,callback = fu
     LockpickHBEEnabled = Value
 end})
 
+MiscSection:toggle({name = "Fullbright",def = FullbrightEnabled,callback = function(Value)
+    FullbrightEnabled = Value
+end})
+
 PlayerGui.ChildAdded:Connect(function(Child)
     if Child.Name ~= "LockpickGUI" then
         return
@@ -404,5 +410,15 @@ PlayerGui.ChildAdded:Connect(function(Child)
             local Bar = Location["B"..i].Bar
             Bar.Size = UDim2.new(0, 35, 0, 500)
         end
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if FullbrightEnabled == true then
+        Lighting.Brightness = 2
+        Lighting.ClockTime = 14
+        Lighting.FogEnd = 100000
+        Lighting.GlobalShadows = false
+        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
     end
 end)
