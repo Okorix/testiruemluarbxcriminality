@@ -27,6 +27,7 @@ local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer.PlayerGui
 local Lighting = game.Lighting
+local ProximityPromptService = game:GetService("ProximityPromptService")
 
 --// Variables
 
@@ -261,6 +262,8 @@ getgenv().Aimbot.FOVSettings.Visible = false
 
 local Window = UILibrary:new({textsize = 13.5,font = Enum.Font.RobotoMono,name = "TESTIRUEM.LUA | CRIMINALITY",color = Color3.fromRGB(225,58,81)})
 
+Window.key = Enum.KeyCode.Home
+
 local VisualsTab = Window:page({name = "Visuals"})
 local AimbotTab = Window:page({name = "Aimbot"})
 local MiscTab = Window:page({name = "Misc"})
@@ -273,6 +276,8 @@ local MiscSection = MiscTab:section({name = "Misc",side = "left",size = 300})
 local LockpickHBEEnabled = false
 local FullbrightEnabled = false
 local InfiniteStaminaEnabled = false
+local InstantProximityPrompts = false
+local FOVValue = 0
 
 PlayerSection:toggle({name = "Enabled",def = ESPSettings.Enabled,callback = function(Value)
     ESPSettings.Enabled = Value
@@ -318,7 +323,7 @@ PlayerSection:toggle({name = "Current tool",def = ESPSettings.CurrentToolTextVis
     ESPSettings.CurrentToolTextVisible = Value
 end})
 
-PlayerSection:keybind({name = "UI Keybind",def = Window.key,callback = function(Key)
+PlayerSection:keybind({name = "Show UI keybind",def = Window.key,callback = function(Key)
    Window.key = Key
 end})
 
@@ -406,21 +411,13 @@ MiscSection:toggle({name = "Infinite stamina",def = InfiniteStaminaEnabled,callb
     InfiniteStaminaEnabled = Value
 end})
 
+MiscSection:toggle({name = "Instant proximity prompts",def = InstantProximityPrompts,callback = function(Value)
+    InstantProximityPrompts = Value
+end})
+
 local OldFOVIdk = workspace.CurrentCamera.FieldOfView
-MiscSection:slider({name = "FOV",def = workspace.CurrentCamera.FieldOfView, max = 360,min = 1,rounding = true,ticking = true,measuring = "",callback = function(Value)
-    local ReplicatedStorage = game:GetService("ReplicatedStorage")
-    local CharStats = ReplicatedStorage.CharStats
-    if CharStats then
-        local PlayerCharStats = CharStats:FindFirstChild(LocalPlayer.Name)
-        if PlayerCharStats then
-            local FOVsFolder = PlayerCharStats:FindFirstChild("FOVs")
-            if FOVsFolder then
-                for _,FovValue in pairs(FOVsFolder:GetChildren()) do
-                    FovValue.Value = math.max(Value - OldFOVIdk, 0)
-                end
-            end
-        end
-    end
+MiscSection:slider({name = "FOV",def = workspace.CurrentCamera.FieldOfView, max = 360,min = 1,rounding = true,ticking = false,measuring = "",callback = function(Value)
+    FOVValue = math.max(Value - OldFOVIdk, 0)
 end})
 
 PlayerGui.ChildAdded:Connect(function(Child)
@@ -465,5 +462,25 @@ RunService.RenderStepped:Connect(function()
             InfStaminaObject = nil
         end
     end
+    if FOVValue > 0 then
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local CharStats = ReplicatedStorage.CharStats
+        if CharStats then
+            local PlayerCharStats = CharStats:FindFirstChild(LocalPlayer.Name)
+            if PlayerCharStats then
+                local FOVsFolder = PlayerCharStats:FindFirstChild("FOVs")
+                if FOVsFolder then
+                    for _,FovValue in pairs(FOVsFolder:GetChildren()) do
+                        FovValue.Value = FOVValue
+                    end
+                end
+            end
+        end
+    end
+end)
 
+ProximityPromptService.PromptButtonHoldBegan:Connect(function(Prompt)
+    if InstantProximityPrompts == true then
+        Prompt.HoldDuration = 0    
+    end
 end)
