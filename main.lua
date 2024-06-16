@@ -414,10 +414,7 @@ MiscSection:toggle({name = "Infinite stamina",def = InfiniteStaminaEnabled,callb
                 if Currents then
                     local BV1 = Instance.new("BoolValue", Currents)
                     BV1.Name = string.reverse("81493.2")
-                    local BV2 = Instance.new("BoolValue", Currents)
-                    BV2.Name = "AntiBleed"
                     table.insert(InfStaminaObjects, BV1)
-                    table.insert(InfStaminaObjects, BV2)
                 end
             end
         end
