@@ -416,7 +416,7 @@ MiscSection:toggle({name = "Instant proximity prompts",def = InstantProximityPro
 end})
 
 local OldFOVIdk = workspace.CurrentCamera.FieldOfView
-MiscSection:slider({name = "FOV",def = workspace.CurrentCamera.FieldOfView, max = 360,min = 1,rounding = true,ticking = false,measuring = "",callback = function(Value)
+MiscSection:slider({name = "FOV",def = workspace.CurrentCamera.FieldOfView, max = 360,min = workspace.CurrentCamera.FieldOfView,rounding = true,ticking = false,measuring = "",callback = function(Value)
     FOVValue = math.max(Value - OldFOVIdk, 0)
 end})
 
